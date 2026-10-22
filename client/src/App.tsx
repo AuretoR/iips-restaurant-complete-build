@@ -113,15 +113,21 @@ export default function App() {
 
     // Observe elements added later too (e.g. menu cards after search/category filters).
     // Without this, newly-rendered cards keep the hidden/blurred initial reveal style forever.
-    const observeReveals = (root) => {
+    const observeReveals = (root: ParentNode) => {
       if (root instanceof Element && root.matches(".reveal-on-scroll")) observer.observe(root);
       if (root && typeof root.querySelectorAll === "function") {
-  root.querySelectorAll(".reveal-on-scroll").forEach((node) => observer.observe(node));
+  root.querySelectorAll(".reveal-on-scroll").forEach((node: Element) => observer.observe(node));
 }
     };
     observeReveals(document);
     const mutationObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => mutation.addedNodes.forEach(observeReveals));
+      mutations.forEach((mutation) => {
+  mutation.addedNodes.forEach((node) => {
+    if (node instanceof Element) {
+      observeReveals(node);
+    }
+  });
+});
     });
     mutationObserver.observe(document.body, { childList: true, subtree: true });
     return () => { mutationObserver.disconnect(); observer.disconnect(); };
