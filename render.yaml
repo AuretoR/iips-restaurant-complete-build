@@ -1,0 +1,27 @@
+databases:
+  - name: iips-restaurant-db
+    databaseName: iips_restaurant
+    user: iips_restaurant_app
+    plan: free
+
+services:
+  - type: web
+    name: iips-restaurant
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm --prefix server install && npm --prefix client install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: iips-restaurant-db
+          property: connectionString
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
